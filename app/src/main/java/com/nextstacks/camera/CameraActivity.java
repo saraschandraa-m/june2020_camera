@@ -7,11 +7,14 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Camera;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -19,6 +22,7 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
 
 public class CameraActivity extends AppCompatActivity {
 
@@ -137,5 +141,23 @@ public class CameraActivity extends AppCompatActivity {
 
         mIvCaptureImage.setImageBitmap(capturedImage);
         camera.startPreview();
+    }
+
+    private void readImagesFromDevice() {
+        Uri imageURI = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+
+        String[] proj = new String[]{MediaStore.Images.Media.DATA};
+
+
+        ArrayList<String> images = new ArrayList<>();
+
+        Cursor cursor = getApplicationContext().getContentResolver().query(imageURI, proj, null, null, null);
+
+        if (cursor != null) {
+            for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToFirst()) {
+                String image = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+                images.add(image);
+            }
+        }
     }
 }
